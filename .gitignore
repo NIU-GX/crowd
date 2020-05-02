@@ -1,0 +1,11 @@
+/.idea/
+/crowd-parent/.idea/
+/crowd-parent/component/target/
+/crowd-parent/component/component.iml
+/crowd-parent/entity/target/
+/crowd-parent/crowd-parent.iml
+*.iml
+/reverse/.idea/
+/util/target/
+/crowd-parent/webui/target/
+/reverse/target/

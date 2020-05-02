@@ -1,0 +1,64 @@
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+    <display-name>Archetype Created Web Application</display-name>
+
+
+    <!--配置contextLoaderListener-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:/applicationContext.xml</param-value>
+    </context-param>
+
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceRequestEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceResponseEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+
+    <servlet>
+        <servlet-name>dispatcherServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:/springmvc.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcherServlet</servlet-name>
+        <!-- url 的配置方式
+            1. /  表示拦截所有路径
+            2. 配置请求扩展名，例如 *.html
+                优点1.  css, js, 图片等静态资源不经过springmvc不需要特殊处理
+                优点2. 可以实现伪静态效果，表面上看起来是访问一个HTML页面，
+                    伪静态作用
+                    1. 给黑客入侵增大难度
+                    2. 有利于SEO优化（让搜索引擎更容易找到我们的项目）
+                缺点：不符合RESTFUL风格
+        -->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>

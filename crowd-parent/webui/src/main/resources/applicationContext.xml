@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <context:component-scan base-package="com.example"/>
+    <!--加载配置文件-->
+    <context:property-placeholder location="classpath:/jdbc.properties"/>
+
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="driverClassName" value="${jdbc.driver}"/>
+    </bean>
+
+    <!--配置SqlSessionFactoryBean-->
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--全局配置文件-->
+        <property name="configLocation" value="classpath:/SqlMapConfig.xml"/>
+        <!--映射配置文件-->
+        <property name="mapperLocations" value="classpath:/mybatis/*Mapper.xml"/>
+    </bean>
+
+    <!--配置MapperScannerConfigurer来扫描Mapper接口所在的包-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.example.mapper"/>
+    </bean>
+
+    <!--配置事务管理器-->
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--配置事务的通知-->
+    <tx:advice id="txAdvice" transaction-manager="dataSourceTransactionManager">
+        <!--配置事务的属性-->
+        <tx:attributes>
+            <!--查询方法 : 配置只读属性，让数据库知道这是查询操作，可以进行一定的优化-->
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+
+            <!--增删改方法：配置事务的传播行为，和回滚的异常-->
+            <!--
+                propagation事务传播行为，
+                    默认值REQUIRED,表示此方法必须工作在事务中，如果当前线程没有事务，自己开启事务。如果已经有事务，那么就使用已有的事务
+                        弊端：使用别人的事务，可能在不需要回滚的时候被回滚。
+                    建议使用的值REQUIRES_NEW,表示此方法必须工作在事务中，如果当前线程没有事务，自己开启事务，如果已经有事务了，也自己开启新事务
+                        优点：不会受到其他事务回滚的影响
+            -->
+            <!--
+                rollback-for：配置根据什么样的异常会回滚
+                    默认：runtimeException
+                    建议：编译时异常和运行时异常都回滚
+            -->
+            <tx:method name="insert*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+            <tx:method name="update*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+            <tx:method name="remove*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+            <tx:method name="batch*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--配置事务切面-->
+    <aop:config>
+        <aop:pointcut id="txPointCut" expression="execution(* *..*ServiceImpl.*(..))"/>
+        <!--将事务的通知和切入点表达式关联起来-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>
+    </aop:config>
+</beans>
