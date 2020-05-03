@@ -2,6 +2,7 @@ package com.example.config;
 
 import com.example.util.CrowdUtil;
 import com.example.util.ResultEntity;
+import com.example.util.exception.AccessForbidenException;
 import com.example.util.exception.LoginFailedException;
 import com.google.gson.Gson;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -73,7 +74,14 @@ public class ExceptionResolver {
     @ExceptionHandler(LoginFailedException.class)
     public ModelAndView resolverLoginFailedException(LoginFailedException e, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String viewName = "/ad-login";
-        ModelAndView modelAndView = common(viewName,e,request,response);
+        ModelAndView modelAndView = common(viewName, e, request, response);
+        return modelAndView;
+    }
+
+    @ExceptionHandler(AccessForbidenException.class)
+    public ModelAndView resolverAccessForbiddenException(AccessForbidenException e, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String viewName = "/ad-login";
+        ModelAndView modelAndView = common(viewName, e, request, response);
         return modelAndView;
     }
 }

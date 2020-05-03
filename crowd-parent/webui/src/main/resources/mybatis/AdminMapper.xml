@@ -70,10 +70,19 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-    id, login_acount, user_password, user_name, email, create_time
-  </sql>
+        id, login_acount, user_password, user_name, email, create_time
+    </sql>
+    <select id="selectAdminByKeyWord" resultMap="BaseResultMap">
+        select *
+        from t_admin
+        where login_acount like concat('%',#{keyWord},'%')
+           or user_name like concat('%',#{keyWord},'%')
+           or email like concat('%',#{keyWord},'%')
+    </select>
     <select id="selectByLoginAccount" parameterType="java.lang.String" resultMap="BaseResultMap">
-        select * from t_admin where login_acount = #{loginAccount}
+        select *
+        from t_admin
+        where login_acount = #{loginAccount}
     </select>
     <select id="selectByExample" parameterType="com.example.entity.AdminExample" resultMap="BaseResultMap">
         select
@@ -96,9 +105,10 @@
         where id = #{id,jdbcType=INTEGER}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from t_admin
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
+        delete
+        from t_admin
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
     <delete id="deleteByExample" parameterType="com.example.entity.AdminExample">
         delete from t_admin
         <if test="_parameter != null">
@@ -106,13 +116,11 @@
         </if>
     </delete>
     <insert id="insert" parameterType="com.example.entity.Admin">
-    insert into t_admin (id, login_acount, user_password, 
-      user_name, email, create_time
-      )
-    values (#{id,jdbcType=INTEGER}, #{loginAcount,jdbcType=VARCHAR}, #{userPassword,jdbcType=CHAR}, 
-      #{userName,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{createTime,jdbcType=CHAR}
-      )
-  </insert>
+        insert into t_admin (id, login_acount, user_password,
+                             user_name, email, create_time)
+        values (#{id,jdbcType=INTEGER}, #{loginAcount,jdbcType=VARCHAR}, #{userPassword,jdbcType=CHAR},
+                #{userName,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{createTime,jdbcType=CHAR})
+    </insert>
     <insert id="insertSelective" parameterType="com.example.entity.Admin">
         insert into t_admin
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -222,12 +230,12 @@
         where id = #{id,jdbcType=INTEGER}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.example.entity.Admin">
-    update t_admin
-    set login_acount = #{loginAcount,jdbcType=VARCHAR},
-      user_password = #{userPassword,jdbcType=CHAR},
-      user_name = #{userName,jdbcType=VARCHAR},
-      email = #{email,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=CHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+        update t_admin
+        set login_acount  = #{loginAcount,jdbcType=VARCHAR},
+            user_password = #{userPassword,jdbcType=CHAR},
+            user_name     = #{userName,jdbcType=VARCHAR},
+            email         = #{email,jdbcType=VARCHAR},
+            create_time   = #{createTime,jdbcType=CHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
 </mapper>

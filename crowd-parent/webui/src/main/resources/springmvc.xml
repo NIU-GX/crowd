@@ -20,7 +20,8 @@
     <mvc:default-servlet-handler/>
 
     <!--异常映射-->
-    <bean id="simpleMappingExceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+    <bean id="simpleMappingExceptionResolver"
+          class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
         <property name="exceptionMappings">
             <props>
                 <prop key="java.lang.Exception">system-error</prop>
@@ -29,4 +30,23 @@
     </bean>
 
     <mvc:view-controller path="/login.html" view-name="ad-login"/>
+    <mvc:view-controller path="/admin/to/main" view-name="main"/>
+    <mvc:view-controller path="/admin/to/logout" view-name="ad-login"/>
+
+    <!--注册拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--配置拦截器要拦截的资源
+                /** ： 对应多层路径        /aaa/bbb/ccc
+                /*  ： 对应一层路径        /aaa
+            -->
+            <mvc:mapping path="/**"/>
+
+            <!--配置不拦截的资源-->
+            <mvc:exclude-mapping path="/admin/login"/>
+            <mvc:exclude-mapping path="/admin/to/logout"/>
+            <mvc:exclude-mapping path="/login.html"/>
+            <bean class="com.example.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
 </beans>

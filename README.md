@@ -633,3 +633,220 @@ public class ExceptionResolver {
 
 **创建MD5加密的工具类**
 
+```java
+public class MD5Util {
+    public static String md5(String source) {
+        // 1. 先判断source是否有效
+        if (source == null || source.length() == 0) {
+            throw new RuntimeException(ConstantUtil.MESSAGE_STRING_INVALIDATE);
+        }
+
+        // 2. 获取MessageDigest对象
+        try {
+            String algorithm = "md5";
+            MessageDigest instance = MessageDigest.getInstance(algorithm);
+
+            // 3. 获取明文密码队友的字节数组
+            byte[] bytes = source.getBytes();
+            // 4. 执行加密
+            byte[] digest = instance.digest(bytes);
+            // 5. 创建BigInteger
+            int signum = 1;
+            BigInteger bigInteger = new BigInteger(signum, digest);
+            // 6. 按照16进制转换为字符串
+            int radix = 16;
+            String result = bigInteger.toString(radix);
+
+            return result;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
+```
+
+**编写登录的controller，service，mapper和异常处理**
+
+```java
+@Controller
+public class AdminController {
+
+    @Autowired
+    AdminService adminService;
+
+    // 登录
+    @RequestMapping(value = "/admin/login")
+    public String adminLogin(@RequestParam("username") String username, @RequestParam("password") String password, HttpSession session) {
+        Logger logger = LoggerFactory.getLogger(LoginController.class);
+        logger.info(username + " " + password);
+
+        Admin admin = adminService.selectByLoginAccount(username,password);
+        session.setAttribute(ConstantUtil.ATTR_NAME_LOGIN_ADMIN,admin);
+        return "redirect:/admin/to/main";
+    }
+
+    // 登出
+    @RequestMapping("/admin/logout")
+    public String adminLogout(HttpSession session) {
+        // 强制session失效
+        session.invalidate();
+        return"redirect:/admin/to/logout";
+    }
+}
+```
+
+## 1. 防止表单重新提交
+
+需要修改controller的返回路径，使用重定向，同时使用view-controller映射路径。
+
+```java
+@RequestMapping(value = "/admin/login")
+public String adminLogin(@RequestParam("username") String username, @RequestParam("password") String password, HttpSession session) {
+    Logger logger = LoggerFactory.getLogger(LoginController.class);
+    logger.info(username + " " + password);
+
+    Admin admin = adminService.selectByLoginAccount(username,password);
+    session.setAttribute(ConstantUtil.ATTR_NAME_LOGIN_ADMIN,admin);
+    return "redirect:/admin/to/main";
+}
+```
+
+## 2. 提取main.html的公共部分
+
+```html
+<%@include file="include-head.jsp" %>
+<%@include file="include-nav.jsp" %>
+<%@include file="include-sidebar.jsp"%>
+```
+
+# 11. 配置拦截器
+
+拦截请求，查看请求是否是登录用户的请求，如果登录放行，没有登录转向登录页面。
+
+不拦截访问公共资源的请求。
+
+## 1. 创建拦截器
+
+```java
+public class LoginInterceptor extends HandlerInterceptorAdapter {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 1. 先获取session对象
+        HttpSession session = request.getSession();
+
+        // 2. 尝试获取Admin对象
+        Admin admin = (Admin) session.getAttribute(ConstantUtil.ATTR_NAME_LOGIN_ADMIN);
+
+        // 3. 判断admin是否为空
+        if (admin == null) {
+            // 4. 抛出异常，访问被拒绝异常
+            throw new AccessForbidenException(ConstantUtil.MESSAGE_ACCESS_FORBIDEN);
+        }
+        // 5. 如果admin不为空，返回true放行
+        return true;
+    }
+}
+```
+
+## 2. 注册拦截器
+
+**在springmvc配置文件中配置**
+
+```xml
+<!--注册拦截器-->
+<mvc:interceptors>
+    <mvc:interceptor>
+        <!--配置拦截器要拦截的资源
+            /** ： 对应多层路径        /aaa/bbb/ccc
+            /*  ： 对应一层路径        /aaa
+        -->
+        <mvc:mapping path="/**"/>
+
+        <!--配置不拦截的资源-->
+        <mvc:exclude-mapping path="/admin/login"/>
+        <mvc:exclude-mapping path="/admin/to/logout"/>
+        <mvc:exclude-mapping path="/login.html"/>
+        <bean class="com.example.interceptor.LoginInterceptor"></bean>
+    </mvc:interceptor>
+</mvc:interceptors>
+```
+
+# 12. 分页显示
+
+## 1. 引入pageHelper
+
+```xml
+<!--mybatis 分页插件-->
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper</artifactId>
+    <version>5.1.11</version>
+</dependency>
+```
+
+## 2. 在sqlsessionFactoryBean中配置pageHelper
+
+```xml
+<property name="plugins">
+    <array>
+        <bean class="com.github.pagehelper.PageInterceptor">
+            <property name="properties">
+                <value>
+                    dialet = mysql
+                    reasonable = true
+                </value>
+            </property>
+        </bean>
+    </array>
+</property>
+```
+
+## 3. 在mapper.xml中编写sql语句
+
+```xml
+<select id="selectAdminByKeyWord" resultMap="BaseResultMap">
+    select *
+    from t_admin
+    where login_acount like concat('%',#{keyWord},'%')
+       or user_name like concat('%',#{keyWord},'%')
+       or email like concat('%',#{keyWord},'%')
+</select>
+```
+
+## 4. controller， service，mapper编写代码
+
+```java
+@RequestMapping("/admin/getpage")
+public String getPageInfo(@RequestParam(value = "keyword", defaultValue = "")
+                          String keyword,
+                          @RequestParam(value = "pageNum", defaultValue = "1") 
+                          Integer pageNum,
+                          @RequestParam(value = "pageSize", defaultValue = "5") 
+                          Integer pageSize,
+                          ModelMap modelMap) {
+    // 1. 获取pageInfo
+    PageInfo<Admin> adminPageInfo = adminService.selectAdminByKeyWord(keyword, pageNum, pageSize);
+    // 2. 将pageInfo存入Model
+    modelMap.addAttribute(ConstantUtil.ATTR_NAME_PAGEINFO,adminPageInfo);
+
+    return "/admin-page";
+}
+
+
+@Override
+    public PageInfo<Admin> selectAdminByKeyWord(String keyWord, Integer pageNum, Integer pageSize) {
+        // 1. 开启pageHelper的静态方法，开启分页功能
+        PageHelper.startPage(pageNum,pageSize);
+
+        // 2. 执行查询
+        List<Admin> admins = adminMapper.selectAdminByKeyWord(keyWord);
+
+        // 3. 疯转到pageInfo对象中
+        PageInfo<Admin> pageInfo = PageInfo.of(admins);
+
+        return pageInfo;
+    }
+
+
+```

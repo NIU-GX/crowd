@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.entity.Admin;
+import com.github.pagehelper.PageInfo;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface AdminService {
     List<Admin> getAll();
 
     Admin selectByLoginAccount(String loginAccount, String password);
+
+    PageInfo<Admin> selectAdminByKeyWord(String keyWord, Integer pageNum, Integer pageSize);
 }

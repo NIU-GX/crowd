@@ -7,6 +7,8 @@ import com.example.entity.Admin;
 import com.example.util.ConstantUtil;
 import com.example.util.MD5Util;
 import com.example.util.exception.LoginFailedException;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +49,20 @@ public class AdminServiceImpl implements AdminService {
             throw new LoginFailedException(ConstantUtil.MESSAGE_PASSWORD_ERROR);
         }
         return admin;
+    }
+
+    @Override
+    public PageInfo<Admin> selectAdminByKeyWord(String keyWord, Integer pageNum, Integer pageSize) {
+        // 1. 开启pageHelper的静态方法，开启分页功能
+        PageHelper.startPage(pageNum,pageSize);
+
+        // 2. 执行查询
+        List<Admin> admins = adminMapper.selectAdminByKeyWord(keyWord);
+
+        // 3. 疯转到pageInfo对象中
+        PageInfo<Admin> pageInfo = PageInfo.of(admins);
+
+        return pageInfo;
     }
 }
 
