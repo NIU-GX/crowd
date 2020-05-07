@@ -10,11 +10,11 @@
 <html>
 <%@include file="include-head.jsp" %>
 
-<link rel="stylesheet" href="./css/pagination.css" />
+<link rel="stylesheet" href="./css/pagination.css"/>
 <script type="text/javascript" src="./jquery/jquery.pagination.js"></script>
 <script type="text/javascript">
 
-    $(function(){
+    $(function () {
 
         // 调用后面声明的函数对页码导航条进行初始化操作
         initPagination();
@@ -52,13 +52,14 @@
         var pageNum = pageIndex + 1;
 
         // 跳转页面
-        window.location.href = "admin/getpage?pageNum="+pageNum+"&keyword=${param.keyword}";
+        window.location.href = "admin/getpage?pageNum=" + pageNum + "&keyword=${param.keyword}";
 
         // 由于每一个页码按钮都是超链接，所以在这个函数最后取消超链接的默认行为
         return false;
     }
 
 </script>
+
 
 <body>
 <%@include file="include-nav.jsp" %>
@@ -82,9 +83,10 @@
             <button type="button" class="btn btn-danger" style="float:right;margin-left:10px;"><i
                     class=" glyphicon glyphicon-remove"></i> 删除
             </button>
-            <button type="button" class="btn btn-primary" style="float:right;"
-                    onclick="window.location.href='add.html'"><i class="glyphicon glyphicon-plus"></i> 新增
-            </button>
+
+            <a href="admin/to/add" class="btn btn-success" style="float:right;margin-left:30px;">
+                <i class="glyphicon glyphicon-plus"></i> 新增
+            </a>
             <br>
             <hr style="clear:both;">
             <div class="table-responsive">
@@ -114,12 +116,22 @@
                                 <td>${admin.userName}</td>
                                 <td>${admin.email}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success btn-xs"><i
-                                            class=" glyphicon glyphicon-check"></i></button>
-                                    <button type="button" class="btn btn-primary btn-xs"><i
-                                            class=" glyphicon glyphicon-pencil"></i></button>
-                                    <button type="button" class="btn btn-danger btn-xs"><i
-                                            class=" glyphicon glyphicon-remove"></i></button>
+                                    <button type="button" class="btn btn-success btn-xs">
+                                        <i class=" glyphicon glyphicon-check"></i>
+                                    </button>
+                                    <!-- 旧代码 -->
+                                    <!-- <button type="button" class="btn btn-primary btn-xs">
+                                        <i class=" glyphicon glyphicon-pencil"></i>
+                                    </button> -->
+                                    <!-- 新代码 -->
+                                    <a href="admin/to/edit?adminId=${admin.id}&pageNum=${pageInfo.pageNum }&keyword=${param.keyword }"
+                                       class="btn btn-primary btn-xs">
+                                        <i class=" glyphicon glyphicon-pencil"></i>
+                                    </a>
+                                    <a href="admin/delete/${admin.id }/${pageInfo.pageNum }/${param.keyword }"
+                                       class="btn btn-danger btn-xs">
+                                        <i class=" glyphicon glyphicon-remove"></i>
+                                    </a>
                                 </td>
                             </tr>
                         </c:forEach>

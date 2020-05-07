@@ -32,6 +32,8 @@
     <mvc:view-controller path="/login.html" view-name="ad-login"/>
     <mvc:view-controller path="/admin/to/main" view-name="main"/>
     <mvc:view-controller path="/admin/to/logout" view-name="ad-login"/>
+    <mvc:view-controller path="/admin/to/add" view-name="add"/>
+    <mvc:view-controller path="/role/to/page" view-name="role-page"/>
 
     <!--注册拦截器-->
     <mvc:interceptors>
@@ -46,6 +48,8 @@
             <mvc:exclude-mapping path="/admin/login"/>
             <mvc:exclude-mapping path="/admin/to/logout"/>
             <mvc:exclude-mapping path="/login.html"/>
+            <mvc:exclude-mapping path="/admin/logout"/>
+            <mvc:exclude-mapping path="/admin/to/main"/>
             <bean class="com.example.interceptor.LoginInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

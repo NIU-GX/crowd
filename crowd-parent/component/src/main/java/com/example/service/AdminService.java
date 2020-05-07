@@ -18,4 +18,10 @@ public interface AdminService {
     Admin selectByLoginAccount(String loginAccount, String password);
 
     PageInfo<Admin> selectAdminByKeyWord(String keyWord, Integer pageNum, Integer pageSize);
+
+    void deleteAdminByPrimaryKey(Integer id);
+
+    Admin selectAdminById(Integer adminId);
+
+    void updateAdmin(Admin admin);
 }

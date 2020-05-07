@@ -1,6 +1,6 @@
 # 1. 项目依赖关系
 
-![](O:\crowd\images\image-20200428113034507.png)
+![](O:\crowd\images\image-20200428113034507.jpg)
 
 # 2. 项目构建
 
@@ -850,3 +850,142 @@ public String getPageInfo(@RequestParam(value = "keyword", defaultValue = "")
 
 
 ```
+
+# 13. 实现用户的增删改
+
+## 1. 先给按钮添加超链接
+
+```xml
+<button type="button" class="btn btn-success btn-xs">
+     <a class=" glyphicon glyphicon-check" href="amdin/"></a>
+</button>
+<button type="button" class="btn btn-primary btn-xs">
+     <a class=" glyphicon glyphicon-pencil" href="admin/update/${admin.id}"></a>
+</button>
+<button type="button" class="btn btn-danger btn-xs">
+     <a class=" glyphicon glyphicon-remove" href="admin/delete/${admin.id}"></a>
+</button>
+```
+
+## 2. 编写controller
+
+### 1. 删除
+
+```java
+@RequestMapping("/admin/delete/{id}/{pageNum}/{keyword}")
+public String deleteAdmin(@PathVariable("id") Integer id,
+                          @PathVariable("pageNum") Integer pageNum,
+                          @PathVariable(value = "keyword") String keyword) {
+    adminService.deleteAdminByPrimaryKey(id);
+
+    return "redirect:/admin/getpage?pageNum=" + pageNum + "&keyword=" + keyword;
+}
+
+@RequestMapping("/admin/delete/{id}/{pageNum}")
+public String deleteAdminWithoutKeyword(@PathVariable("id") Integer id,
+                                        @PathVariable("pageNum") Integer pageNum) {
+    adminService.deleteAdminByPrimaryKey(id);
+
+    return "redirect:/admin/getpage?pageNum=" + pageNum;
+}
+```
+
+### 2. 增加
+
+增加用户要求登录账号不能重复，在数据库中给login_account字段添加unique索引。
+
+```java
+@RequestMapping("/admin/add")
+public String saveAdmin(Admin admin) {
+    adminService.saveAdmin(admin);
+    // 为了让用户第一眼就看到新增加的用户，直接跳转到最后一页
+    return "redirect:/admin/getpage?pageNum=" + Integer.MAX_VALUE;
+}
+```
+
+添加账户重复异常处理
+
+```java
+@ExceptionHandler(LoginAccountAlreadlyInUse.class)
+public ModelAndView resolverLoginAccountAlreadlyInUseException(LoginAccountAlreadlyInUse e, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String viewName = "/add";
+    ModelAndView modelAndView = common(viewName, e, request, response);
+    return modelAndView;
+}
+```
+
+## 3. 修改
+
+```java
+@RequestMapping("/admin/to/edit")
+public String toAdminEdit(@RequestParam("adminId") Integer adminId, ModelMap map) {
+
+    Admin admin = adminService.selectAdminById(adminId);
+    map.addAttribute("admin", admin);
+    return "/edit";
+}
+
+@RequestMapping("/admin/edit")
+public String editAdmin(Admin admin,
+                        @RequestParam("pageNum") Integer pageNum,
+                        @RequestParam("keyword") String keyword,
+                        ModelMap map) {
+
+    adminService.updateAdmin(admin);
+    return "redirect:/admin/getpage?pageNum=" + pageNum + "&keyword=" + keyword;
+}
+```
+
+# 14. 角色控制（权限控制）
+
+## 1. 如何进行权限控制
+
+### 1. 定义资源
+
+资源就是系统需要保护起来的功能。具体形式有很多种，URL地址，controller方法，service方法，页面等都可以定义为资源被权限控制系统保护起来 。
+
+### 2. 创建权限
+
+功能复杂的项目会有很多的资源，单个操作资源过于复杂，。为了简化操作，可以将多个资源封装在一起，打包成一个“权限”，分配给有需要的人。
+
+### 3. 创建角色
+
+角色就是用户的分组，先给角色分配权限，再把角色分配给用户
+
+### 4. 管理用户
+
+用户就是登录系统的账号密码
+
+### 5. 建立关联关系
+
+权限-----资源：单向多对多
+
+​		单向： java类之间单向，从权限实体类可以获取到资源对象的集合，但是通过资源获取不到权限
+
+​		多对多： 数据库表真间多对多
+
+角色-----权限：单向多对多
+
+用户-----角色：双向多对多
+
+## 2. 数据库多对多实现
+
+多对多的实现需要依靠中间表
+
+## 3. RBAC权限模型（Role-Based Access Contro**l）**
+
+**基于角色的访问控制**： 一个用户可以对应多个角色，一个角色拥有多个权限
+
+## 4.创建角色数据表
+
+```sql
+CREATE TABLE `t_role` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+**利用mybatis逆向工程生成实体，mapper，和映射配置文件**
+
+## 5. 角色维护模块

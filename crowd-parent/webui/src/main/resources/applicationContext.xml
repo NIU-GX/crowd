@@ -78,6 +78,7 @@
             <tx:method name="update*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
             <tx:method name="remove*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
             <tx:method name="batch*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+            <tx:method name="delete*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
         </tx:attributes>
     </tx:advice>
 

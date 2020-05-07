@@ -1,4 +1,4 @@
-package com.example.crowd.entity;
+package com.example.entity;
 
 public class Admin {
     private Integer id;

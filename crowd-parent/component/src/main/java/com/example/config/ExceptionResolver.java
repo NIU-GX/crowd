@@ -3,6 +3,8 @@ package com.example.config;
 import com.example.util.CrowdUtil;
 import com.example.util.ResultEntity;
 import com.example.util.exception.AccessForbidenException;
+import com.example.util.exception.LoginAccountAlreadlyInUse;
+import com.example.util.exception.LoginAccountAlreadlyInUseForUpdate;
 import com.example.util.exception.LoginFailedException;
 import com.google.gson.Gson;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -81,6 +83,20 @@ public class ExceptionResolver {
     @ExceptionHandler(AccessForbidenException.class)
     public ModelAndView resolverAccessForbiddenException(AccessForbidenException e, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String viewName = "/ad-login";
+        ModelAndView modelAndView = common(viewName, e, request, response);
+        return modelAndView;
+    }
+
+    @ExceptionHandler(LoginAccountAlreadlyInUse.class)
+    public ModelAndView resolverLoginAccountAlreadlyInUseException(LoginAccountAlreadlyInUse e, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String viewName = "/add";
+        ModelAndView modelAndView = common(viewName, e, request, response);
+        return modelAndView;
+    }
+
+    @ExceptionHandler(LoginAccountAlreadlyInUseForUpdate.class)
+    public ModelAndView resolverLoginAccountAlreadlyInUseForUpdateException(LoginAccountAlreadlyInUseForUpdate e, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String viewName = "system-error";
         ModelAndView modelAndView = common(viewName, e, request, response);
         return modelAndView;
     }

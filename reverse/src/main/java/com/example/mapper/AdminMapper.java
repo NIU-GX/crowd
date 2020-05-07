@@ -1,7 +1,7 @@
-package com.example.crowd.mapper;
+package com.example.mapper;
 
-import com.example.crowd.entity.Admin;
-import com.example.crowd.entity.AdminExample;
+import com.example.entity.Admin;
+import com.example.entity.AdminExample;
 
 import java.util.List;
 
