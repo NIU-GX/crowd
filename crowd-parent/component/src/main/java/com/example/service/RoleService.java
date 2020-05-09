@@ -3,7 +3,6 @@ package com.example.service;
 import com.example.entity.Role;
 import com.github.pagehelper.PageInfo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,4 +17,8 @@ public interface RoleService {
     void updateRole(Role role);
 
     void deleteRoles(List<Integer> roleList);
+
+    List<Role> getAssignedRole(Integer adminId);
+
+    List<Role> getUnassignedRole(Integer adminId);
 }

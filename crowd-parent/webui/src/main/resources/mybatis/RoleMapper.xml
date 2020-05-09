@@ -68,6 +68,12 @@
     <sql id="Base_Column_List">
         id, name
     </sql>
+    <select id="selectAssignRole" resultMap="BaseResultMap">
+        select * from t_role where id in (select role_id from inner_admin_role where admin_id = #{adminId})
+    </select>
+    <select id="selectUnassignRole" resultMap="BaseResultMap">
+        select * from t_role where id not in (select role_id from inner_admin_role where admin_id = #{adminId})
+    </select>
     <select id="selectRoleByKeywork" resultMap="BaseResultMap">
         select *
         from t_role
