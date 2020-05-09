@@ -35,7 +35,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>5.0.10.RELEASE</version>
+            <version>5.2.6.RELEASE</version>
         </dependency>
         <!--mybatis 分页插件-->
         <dependency>
