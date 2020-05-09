@@ -14,7 +14,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <!--使用父工程管理项目依赖的版本-->
-        <spring.version>5.0.10.RELEASE</spring.version>
+        <spring.version>5.2.6.RELEASE</spring.version>
         <spring.security.version>5.0.10.RELEASE</spring.security.version>
     </properties>
 
